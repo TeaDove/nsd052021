@@ -22,13 +22,13 @@ TBD
 # How to Run server
 
 ```
-uvicorn app.main:app --reload --app-dir ../back --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --app-dir ../back --host 0.0.0.0 --port 8000
 yarn --cwd front start
 ```
 
 or
 
 ```
-./utils/run_back.sh   # run bakcend
-./utils/run_front.sh  # run frontend
+cd ./utils && ./run_back.sh   # run bakcend
+cd ./utils && ./run_front.sh  # run frontend
 ```
