@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 PASS='FR33d0m13#&'
 
 rsync --delete -havzP --exclude='/.git' \
