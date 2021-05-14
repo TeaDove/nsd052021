@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -25,22 +25,18 @@ print("Hello world!")
 async def root():
     return {"message": "Hello World"}
 
+
 # Типы элемента : text , table
 # данные в поле дата
 
 
-@app.get("/get-table")
-async def root():
-    with open('DEV.csv') as f:
+@app.post("/get-table")
+async def get_table(file: UploadFile = File(...)):
+    # Дока по FastAPI File https://fastapi.tiangolo.com/tutorial/request-files/#uploadfile
+    with open("DEV.csv") as f:
         table = f.read()
         return [
-            {
-                "type": "table",
-                "data": table
-            }, {
-                "type": "text",
-                "data": "iewofjiow weifnowq qoweinfoiwq qwoeinfowiqen"
-            }, {
-                "type": "table",
-                "data": table
-            }]
+            {"type": "table", "data": table},
+            {"type": "text", "data": file.filename + " " + file.content_type},
+            {"type": "table", "data": table},
+        ]
