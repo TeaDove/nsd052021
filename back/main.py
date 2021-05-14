@@ -6,6 +6,8 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "http://65.21.155.166",
+    "http://65.21.155.166:3000",
 ]
 
 app.add_middleware(
@@ -22,4 +24,3 @@ print("Hello world!")
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
