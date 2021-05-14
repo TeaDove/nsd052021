@@ -1,67 +1,25 @@
 import React, { useState, useEffect } from "react";
 import * as csv from "fast-csv";
-import {
-  Document as XDocument,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  Packer,
-} from "docx";
+import { Document as XDocument, Packer } from "docx";
 import downloadFile from "js-file-download";
-// Packer.
-type ParagraphEl = {
+import { createDoc } from "./exporting/word";
+import ExcelJS from "exceljs";
+
+export type ParagraphEl = {
   type: "text";
   data: string;
 };
-type TableEl = {
+export type TableEl = {
   type: "table";
   data: any[][];
 };
 
-type DocElement = ParagraphEl | TableEl;
+export type DocElement = ParagraphEl | TableEl;
 type HDoc = DocElement[];
 
 type DirtyDocElement = DocElement & {
   data: any;
 };
-
-function getParagraph(el: ParagraphEl): Paragraph {
-  return new Paragraph(el.data);
-}
-
-function getTable(el: TableEl): Table {
-  const table = new Table({
-    rows: el.data.map(
-      (row) =>
-        new TableRow({
-          children: row.map(
-            (cell) => new TableCell({ children: [new Paragraph(cell)] })
-          ),
-        })
-    ),
-  });
-
-  return table;
-}
-
-function createDoc(params: DocElement[]): XDocument {
-  console.log("Creating DOCX");
-
-  const doc = new XDocument({
-    sections: [
-      {
-        children: params.map((p) =>
-          p.type === "text" ? getParagraph(p) : getTable(p)
-        ),
-      },
-    ],
-  });
-
-  console.log("Created DOCX", doc);
-
-  return doc;
-}
 
 function Preview({ table }: { table: HDoc }) {
   return (
@@ -103,16 +61,21 @@ function Preview({ table }: { table: HDoc }) {
 }
 
 function App() {
-  const [response, setresponse] = useState(null);
+  const [pingStatus, setPing] =
+    useState<"loading" | "error" | "success">("loading");
   const [table, setrawTable] = useState<HDoc>([]);
-  const [Doc, setDoc] = useState<XDocument | null>(null);
+  // const [Doc, setDoc] = useState<XDocument | null>(null);
 
   useEffect(() => {
     fetch(window.location.protocol + "//" + window.location.hostname + ":8000/")
       .then((res) => res.json())
       .then((res) => {
         console.log("Got from server", res);
-        setresponse(res);
+        setPing("success");
+      })
+      .catch((err) => {
+        console.error(err);
+        setPing("error");
       });
 
     fetch(
@@ -150,13 +113,27 @@ function App() {
         );
 
         setrawTable(data);
-        setDoc(createDoc(data));
       });
   }, []);
 
-  const handleDownload = async () => {
-    if (Doc === null) return;
-    downloadFile(await Packer.toBlob(Doc), "doc.docx");
+  const handleDocxDownload = async () => {
+    const doc = createDoc(table);
+    if (doc === null) return;
+    downloadFile(await Packer.toBlob(doc), "doc.docx");
+  };
+
+  const handleExcelDownload = async () => {
+    const doc = new ExcelJS.Workbook();
+    for (const elem of table) {
+      if (elem.type === "table") {
+        const sheet = doc.addWorksheet();
+        sheet.addRows(elem.data);
+      }
+    }
+    const buffer = await doc.xlsx.writeBuffer();
+    // const test = new Blob();
+    // if (doc === null) return;
+    downloadFile(buffer, "table.xlsx");
   };
 
   return (
@@ -165,12 +142,24 @@ function App() {
         <h1>Здарова</h1>
 
         <div>
-          {response === null ? <span>Загрузка</span> : JSON.stringify(response)}
+          Статус сервера:{" "}
+          <span className={"status " + pingStatus}>
+            {pingStatus === "loading"
+              ? "загрузка"
+              : pingStatus === "success"
+              ? "работает"
+              : "не отвечает"}
+          </span>
         </div>
 
         <Preview table={table} />
 
-        {Doc !== null && <button onClick={handleDownload}>Скачать docx</button>}
+        {table !== null && (
+          <button onClick={handleDocxDownload}>Скачать docx</button>
+        )}
+        {table !== null && (
+          <button onClick={handleExcelDownload}>Скачать excel</button>
+        )}
       </main>
     </div>
   );

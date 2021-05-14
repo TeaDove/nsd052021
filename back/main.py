@@ -32,10 +32,15 @@ async def root():
 @app.get("/get-table")
 async def root():
     with open('DEV.csv') as f:
-        return [{
-            "type": "text",
-            "data": "iewofjiow weifnowq qoweinfoiwq qwoeinfowiqen"
-        }, {
-            "type": "table",
-            "data": f.read()
-        }]
+        table = f.read()
+        return [
+            {
+                "type": "table",
+                "data": table
+            }, {
+                "type": "text",
+                "data": "iewofjiow weifnowq qoweinfoiwq qwoeinfowiqen"
+            }, {
+                "type": "table",
+                "data": table
+            }]
