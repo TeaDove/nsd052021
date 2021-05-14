@@ -24,3 +24,18 @@ print("Hello world!")
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+# Типы элемента : text , table
+# данные в поле дата
+
+
+@app.get("/get-table")
+async def root():
+    with open('DEV.csv') as f:
+        return [{
+            "type": "text",
+            "data": "iewofjiow weifnowq qoweinfoiwq qwoeinfowiqen"
+        }, {
+            "type": "table",
+            "data": f.read()
+        }]
