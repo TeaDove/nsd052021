@@ -3,6 +3,11 @@
 
 # How to Run server
 ```
-uvicorn main:app --reload --app-dir back
-cd front && yarn start
+uvicorn main:app --reload --app-dir ../back --host 0.0.0.0 --port 8000
+yarn --cwd front start
+```
+or
+```
+./utils/run_back.sh   # run bakcend
+./utils/run_front.sh  # run frontend
 ```

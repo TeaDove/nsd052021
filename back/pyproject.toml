@@ -2,7 +2,9 @@
 name = "nsd-backend"
 version = "0.1.0"
 description = "Backend service for our hackathon solution"
-authors = ["Artyom Sosedka <m1801239@edu.misis.ru>", "Vladislav Tishin <Imvibe@outlook.com>", "Leon Minasyan <>"]
+authors = ["Artyom Sosedka <m1801239@edu.misis.ru>",
+    "Vladislav Tishin <Imvibe@outlook.com>",
+    "Leon Minasyan <>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
