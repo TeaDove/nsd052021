@@ -7,6 +7,8 @@ authors = ["Artyom Sosedka <m1801239@edu.misis.ru>", "Vladislav Tishin <Imvibe@o
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = "^0.65.1"
+starlette = "^0.14.2"
+uvicorn = "^0.13.4"
 
 [tool.poetry.dev-dependencies]
 
