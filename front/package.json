@@ -9,14 +9,15 @@
     "@types/node": "^15.0.3",
     "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.5",
+    "docx": "^6.0.3",
+    "exceljs": "^4.2.1",
     "fast-csv": "^4.3.6",
+    "js-file-download": "^0.4.12",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
     "react-table": "^7.7.0",
     "typescript": "^4.2.4",
-    "docx": "^6.0.3",
-    "exceljs": "^4.2.1",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
