@@ -154,10 +154,10 @@ function App() {
       ) : (
         <>
           {hDoc.map((d, i) => (
-            <>
+            <div key={d.name}>
               <h2>{d.name || `Файл № ${i + 1}`}</h2>
               <Preview table={d.data} />
-            </>
+            </div>
           ))}
           {hDoc !== null && (
             <button onClick={handleDocxDownload}>Скачать docx 📄</button>
