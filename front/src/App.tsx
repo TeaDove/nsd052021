@@ -5,6 +5,7 @@ import downloadFile from "js-file-download";
 import { createDoc } from "./exporting/word";
 import { createExcel } from "./exporting/excel";
 import { Preview } from "./components/Preview";
+import JSZip from "jszip";
 
 export type ParagraphEl = {
   data_type: "text";
@@ -47,23 +48,35 @@ function App() {
   }, []);
 
   const handleDocxDownload = async () => {
-    hDoc.map(async (d, i) => {
-      const doc = createDoc(d.data);
-      if (doc === null) return;
-      downloadFile(await Packer.toBlob(doc), `${d.name || `doc-${i}`}.docx`);
+    const archive = new JSZip();
+
+    await Promise.all(
+      hDoc.map(async (d, i) => {
+        const doc = createDoc(d.data);
+        if (doc === null) return;
+        archive.file(`${d.name || `doc-${i}`}.docx`, Packer.toBlob(doc));
+        // downloadFile(await Packer.toBlob(doc), `${d.name || `doc-${i}`}.docx`);
+      })
+    );
+
+    archive.generateAsync({ type: "blob" }).then((content) => {
+      downloadFile(content, `documents.zip`);
     });
   };
 
   const handleExcelDownload = async () => {
-    hDoc.map(async (d, i) => {
-      // const doc = createDoc(d.data);
-      // if (doc === null) return;
-      // downloadFile(await Packer.toBlob(doc), `${d.name || `doc-${i}`}.docx`);
-      const doc = createExcel(d.data);
-      const buffer = await doc.xlsx.writeBuffer();
-      // const test = new Blob();
-      // if (doc === null) return;
-      downloadFile(buffer, `${d.name || `table-${i}`}.xlsx`);
+    const archive = new JSZip();
+
+    await Promise.all(
+      hDoc.map(async (d, i) => {
+        const doc = createExcel(d.data);
+        const buffer = await doc.xlsx.writeBuffer();
+        archive.file(`${d.name || `table-${i}`}.xlsx`, buffer);
+      })
+    );
+
+    archive.generateAsync({ type: "blob" }).then((content) => {
+      downloadFile(content, `tables.zip`);
     });
   };
 
