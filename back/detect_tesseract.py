@@ -1,4 +1,5 @@
 from __future__ import print_function
+from typing import Any, IO, Union
 import pytesseract
 import cv2
 from PIL import Image
@@ -16,11 +17,13 @@ except ModuleNotFoundError:
 def imgread(im):
     try:
         image = Image.open(io.BytesIO(urllib.urlopen(im).read()))
-    except ValueError:
+    # except ValueError:
+    except:
         try:
             image = Image.open(im)
         except FileExistsError:
             return None
+
     try:
         image = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
     except:
@@ -71,7 +74,7 @@ def find_cnts(image, table):
     return cnts
 
 
-def get_text(path_to_image):
+def get_text(path_to_image: Union[str, IO]):
     image = imgread(path_to_image)
     table_text = []
 
@@ -135,4 +138,5 @@ def get_text(path_to_image):
     return table_text
 
 
-print(get_text("test_2.png"))
+# with open("test_2.png", "rb") as f:
+#     print(get_text(f))

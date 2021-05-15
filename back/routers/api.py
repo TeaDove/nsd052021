@@ -19,8 +19,8 @@ async def upload_files(files: List[UploadFile] = File(...)) -> List[ProcessedRes
             ContentType.jpg: process_jpg,
             ContentType.png: process_png,
         }.get(content_type, ContentType.png)
-        contents = await file.read()
-        processed_response = await process_function(contents)
+        # contents = await file.read()
+        processed_response = await process_function(file.file)
         processed_response.name = filename
         processed_responses.append(processed_response)
 
