@@ -4,7 +4,7 @@ import { HDoc } from "../App";
 export function createExcel(table: HDoc) {
   const doc = new ExcelJS.Workbook();
   for (const elem of table) {
-    if (elem.type === "table") {
+    if (elem.data_type === "table") {
       const sheet = doc.addWorksheet();
       sheet.addRows(elem.data);
     }

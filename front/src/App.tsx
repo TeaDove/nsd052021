@@ -7,25 +7,31 @@ import { createExcel } from "./exporting/excel";
 import { Preview } from "./components/Preview";
 
 export type ParagraphEl = {
-  type: "text";
+  data_type: "text";
   data: string;
 };
 export type TableEl = {
-  type: "table";
+  data_type: "table";
   data: any[][];
 };
 
 export type DocElement = ParagraphEl | TableEl;
-export type HDoc = DocElement[];
 
 type DirtyDocElement = DocElement & {
   data: any;
 };
 
+export type HDoc = DocElement[];
+export type HDocMany = { name: string; data: HDoc }[];
+type DirtyResponse = {
+  name: string;
+  data: DirtyDocElement[];
+}[];
+
 function App() {
   const [pingStatus, setPing] =
     useState<"loading" | "error" | "success">("loading");
-  const [hDoc, setHDoc] = useState<HDoc>([]);
+  const [hDoc, setHDoc] = useState<HDocMany>([]);
 
   useEffect(() => {
     fetch(window.location.protocol + "//" + window.location.hostname + ":8000/")
@@ -41,17 +47,24 @@ function App() {
   }, []);
 
   const handleDocxDownload = async () => {
-    const doc = createDoc(hDoc);
-    if (doc === null) return;
-    downloadFile(await Packer.toBlob(doc), "doc.docx");
+    hDoc.map(async (d, i) => {
+      const doc = createDoc(d.data);
+      if (doc === null) return;
+      downloadFile(await Packer.toBlob(doc), `${d.name || `doc-${i}`}.docx`);
+    });
   };
 
   const handleExcelDownload = async () => {
-    const doc = createExcel(hDoc);
-    const buffer = await doc.xlsx.writeBuffer();
-    // const test = new Blob();
-    // if (doc === null) return;
-    downloadFile(buffer, "table.xlsx");
+    hDoc.map(async (d, i) => {
+      // const doc = createDoc(d.data);
+      // if (doc === null) return;
+      // downloadFile(await Packer.toBlob(doc), `${d.name || `doc-${i}`}.docx`);
+      const doc = createExcel(d.data);
+      const buffer = await doc.xlsx.writeBuffer();
+      // const test = new Blob();
+      // if (doc === null) return;
+      downloadFile(buffer, `${d.name || `table-${i}`}.xlsx`);
+    });
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -81,10 +94,10 @@ function App() {
       { method: "POST", body: formData }
     )
       .then((res) => res.json())
-      .then(async (res: DirtyDocElement[]) => {
+      .then(async (res: DirtyResponse) => {
         console.log("Got from server", res);
 
-        const data = await parseDirtyResponse(res);
+        const data = await parseAllResponce(res);
 
         setHDoc(data);
       })
@@ -127,8 +140,12 @@ function App() {
         <p>Пока здесь пусто 😶. Попробуйте загрузить файл ⬆️</p>
       ) : (
         <>
-          <Preview table={hDoc} />
-
+          {hDoc.map((d, i) => (
+            <>
+              <h2>{d.name || `Файл № ${i + 1}`}</h2>
+              <Preview table={d.data} />
+            </>
+          ))}
           {hDoc !== null && (
             <button onClick={handleDocxDownload}>Скачать docx 📄</button>
           )}
@@ -143,10 +160,28 @@ function App() {
 
 export default App;
 
-async function parseDirtyResponse(res: DirtyDocElement[]) {
+function parseAllResponce(params: DirtyResponse): Promise<HDocMany> {
+  return Promise.all(
+    params.map(async (file) => ({
+      name: file.name,
+      data: await parseDirtyResponse(file.data),
+    }))
+  );
+}
+
+async function parseDirtyResponse(res: DirtyDocElement[]): Promise<HDoc> {
+  if (!res) {
+    return [
+      {
+        data_type: "text",
+        data: "Пусто",
+      },
+    ];
+  }
+
   return await Promise.all(
     res.map((elem) => {
-      if (elem.type === "text") return elem;
+      if (elem.data_type === "text") return elem;
       // return { type: elem.type, table:  };
       return new Promise<DocElement>((res, rej) => {
         let data: any[] = [];
@@ -156,7 +191,7 @@ async function parseDirtyResponse(res: DirtyDocElement[]) {
           .on("end", (rowCount: number) => {
             console.log(`Parsed ${rowCount} rows`);
             res({
-              type: elem.type,
+              data_type: elem.data_type,
               data: data,
             });
           })

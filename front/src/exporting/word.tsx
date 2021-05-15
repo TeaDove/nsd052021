@@ -31,7 +31,7 @@ export function createDoc(params: DocElement[]): XDocument {
     sections: [
       {
         children: params.map((p) =>
-          p.type === "text" ? getParagraph(p) : getTable(p)
+          p.data_type === "text" ? getParagraph(p) : getTable(p)
         ),
       },
     ],

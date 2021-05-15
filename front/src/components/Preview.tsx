@@ -1,18 +1,18 @@
 import React from "react";
-import { HDoc } from "../App";
+import { HDoc, HDocMany } from "../App";
 import styles from "./Preview.module.css";
 
 export function Preview({ table }: { table: HDoc }) {
   return (
     <div className={styles.preview}>
       {table.map((el, i) => {
-        if (el.type === "text") {
+        if (el.data_type === "text") {
           return (
             <div key={i}>
               <p>{el.data}</p>
             </div>
           );
-        } else if (el.type === "table") {
+        } else if (el.data_type === "table") {
           return (
             <table
               key={i}
