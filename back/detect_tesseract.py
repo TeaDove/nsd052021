@@ -1,10 +1,12 @@
 from __future__ import print_function
-import pytesseract
-import cv2
-from PIL import Image
+
 import io
-import numpy as np
 import re
+
+import cv2
+import numpy as np
+import pytesseract
+from PIL import Image
 from imutils import contours
 
 try:
@@ -84,7 +86,7 @@ def get_text(path_to_image):
             x, y, w, h = cv2.boundingRect(c)
 
             cv2.rectangle(image, (x, y), (x + w, y + h), (36, 255, 12))
-            ROI = original[y : y + h, x : x + w]
+            ROI = original[y: y + h, x: x + w]
             ROI = cv2.resize(ROI, (w * 2, h * 2))
             # extractedInformation = pytesseract.image_to_string(ROI, config='--psm 6 --oem 1', lang='rus')
             text1 = pytesseract.image_to_string(ROI, lang="rus", config="--psm 6")
@@ -117,9 +119,9 @@ def get_text(path_to_image):
             elif text2 == text3 and len(text2) > 2:
                 text = text2
             elif (
-                text3 != ""
-                and re.sub(" *[^ \-\d\.,]+ *", "", text3) == text3
-                and (len(text1) + len(text2)) / 2 * 0.4 < len(text3)
+                    text3 != ""
+                    and re.sub(" *[^ \-\d\.,]+ *", "", text3) == text3
+                    and (len(text1) + len(text2)) / 2 * 0.4 < len(text3)
             ):
                 text = text3
             elif text3 != "" and len(text1) <= 2 and len(text2) <= 2:
