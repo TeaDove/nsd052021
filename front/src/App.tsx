@@ -151,6 +151,7 @@ function App() {
     // setprocessonigStatus("success");
     // setTimeWait(0);
     // DEV_DATA
+    // console.log(JSON.parse(DEV_DATA[0].data[0].data));
   };
 
   return (
@@ -184,8 +185,12 @@ function App() {
       </form>
 
       {processonigStatus === "loading" && (
-        <div className="progressbar" data-value={timeWait}>
-          {timeWait}
+        <div className="progressbar">
+          <div
+            className="loading"
+            style={{ width: timeWait * 100 + "%" }}
+          ></div>
+          {/* {timeWait} */}
         </div>
       )}
 
