@@ -19,7 +19,10 @@ export type TableEl = {
 export type DocElement = ParagraphEl | TableEl;
 
 type DirtyDocElement = DocElement & {
-  data: any;
+  /**
+   * JSON in string
+   */
+  data: string;
 };
 
 export type HDoc = DocElement[];
@@ -222,24 +225,24 @@ async function parseDirtyResponse(res: DirtyDocElement[]): Promise<HDoc> {
   return await Promise.all(
     res.map((elem) => {
       if (elem.data_type === "text") return elem;
-      // return { type: elem.type, table:  };
-      return new Promise<DocElement>((res, rej) => {
-        let data: any[] = [];
-        csv
-          .parseString(elem.data)
-          .on("data", (row) => data.push(row))
-          .on("end", (rowCount: number) => {
-            console.log(`Parsed ${rowCount} rows`);
-            res({
-              data_type: elem.data_type,
-              data: data,
-            });
-          })
-          .on("error", (error) => {
-            console.error(error);
-            rej();
-          });
-      });
+
+      return { data_type: elem.data_type, data: JSON.parse(elem.data) };
     })
   );
 }
+// return new Promise<DocElement>((res, rej) => {
+//   let data: any[] = [];
+//   csv
+//     .parseString(elem.data)
+//     .on("data", (row) => data.push(row))
+//     .on("end", (rowCount: number) => {
+//       console.log(`Parsed ${rowCount} rows`);
+//       res({
+//         data_type: elem.data_type,
+//         data: data,
+//       });
+//     })
+//     .on("error", (error) => {
+//       console.error(error);
+//       rej();
+//     });

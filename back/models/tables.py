@@ -26,7 +26,7 @@ class Table:
     grid: List[Tuple[int, int]]
 
     def fill_table(self):
-        cell_coords = [cell.size for cell in self.cells]
+        cell_coords = [cell.coordinates for cell in self.cells]
         for grid_point in self.grid:
             if grid_point not in cell_coords:
                 new_cell = Cell()
@@ -35,18 +35,38 @@ class Table:
                 new_cell.content = None
 
                 self.cells.append(new_cell)
+        new_cells = []
+        flag = True
+        for cell in self.cells:
+            for new_cell in new_cells:
+                if cell.coordinates == new_cell.coordinates:
+                    flag = False
+                    break
+                elif (
+                    cell.coordinates[0] >= self.dimensions[0]
+                    or cell.coordinates[1] >= self.dimensions[1]
+                ):
+                    flag = False
+                    break
+            if flag:
+                new_cells.append(cell)
+            flag = True
+        self.cells = new_cells
 
     def sort_table(self):
         self.cells = sorted(self.cells)
 
     def gen_rows(self):
-        return np.reshape(self.cells, self.dimensions)
+        rows = np.reshape(
+            np.array([cell.__dict__() for cell in self.cells]), self.dimensions
+        )
+        return rows.tolist()
 
     def __dict__(self):
         return [row for row in self.gen_rows()]
 
     def __str__(self):
-        return json.dumps(self.__dict__)
+        return json.dumps(self.__dict__())
 
 
 class ImageCell(Cell):
@@ -63,7 +83,7 @@ class ImageTable:
         if cell is not None:
             coordinates = cell.coordinates
             size = cell.size
-            roi = image[coordinates[0]:size[1], coordinates[1]:size[0]]
+            roi = image[coordinates[0] : size[1], coordinates[1] : size[0]]
             return roi
         else:
             return np.zeros(1)
@@ -73,6 +93,7 @@ class TesseractTable:
     cells: List[Cell]
 
     def __init__(self, data: List[Dict]):
+        self.cells = []
         for data_cell in data:
             coordinates = (data_cell["y"], data_cell["x"])
             size = (data_cell["w"], data_cell["h"])

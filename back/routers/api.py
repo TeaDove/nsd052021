@@ -8,7 +8,7 @@ from models.models import ContentType, ProcessedResponse
 router = APIRouter(prefix="/api", tags=["api"])
 
 
-@router.post("/upload-files", response_model=List[ProcessedResponse])
+@router.post("/upload-files")
 async def upload_files(files: List[UploadFile] = File(...)) -> List[ProcessedResponse]:
     processed_responses: List[ProcessedResponse] = []
     for file in files:
@@ -19,8 +19,9 @@ async def upload_files(files: List[UploadFile] = File(...)) -> List[ProcessedRes
             ContentType.jpg: process_jpg,
             ContentType.png: process_png,
         }.get(content_type, ContentType.png)
-        processed_response = await process_function(file.file)
+        processed_response = process_function(file.file)
         processed_response.name = filename
-        processed_responses.append(processed_response)
-
+        # print(processed_response.__dict__())
+        processed_responses.append(processed_response.__dict__())
+    print(processed_responses)
     return processed_responses

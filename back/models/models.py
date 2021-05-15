@@ -16,8 +16,8 @@ class DataType(str, Enum):
 
 
 class ProcessedData(BaseModel):
-    data_type: DataType
-    data: str
+    data_type: Optional[DataType]
+    data: Any
 
     def __dict__(self):
         return {"type": self.data_type.__str__, "data": self.data.__dict__}
@@ -31,9 +31,15 @@ class ProcessedTable(ProcessedData):
     data_type = DataType.table
 
 
-class ProcessedResponse(BaseModel):
-    name: Optional[str]
-    data: Optional[List[ProcessedData]]
+class ProcessedResponse:
+    name: Optional[str] = ""
+    content: Any
+
+    # def __init__(self):
+    #     self.data = []
+
+    def get_dict(self):
+        return {"name": self.name, "data": [d.__dict__ for d in self.content]}
 
     def __dict__(self):
-        return {"name": self.name, "data": [d.__dict__ for d in self.data]}
+        return {"name": self.name, "data": [d.__dict__ for d in self.content]}
