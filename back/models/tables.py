@@ -1,3 +1,4 @@
+import json
 from typing import Tuple, Any, List, Dict
 
 import numpy as np
@@ -14,6 +15,9 @@ class Cell:
             return self.coordinates[1] < other.coordinates[1]
         else:
             return self.coordinates[0] < other.coordinates[0]
+
+    def __repr__(self):
+        return json.dumps(self.__dict__())
 
     def __dict__(self):
         return {"data": self.content, "span": self.size}
@@ -59,10 +63,10 @@ class Table:
     def gen_rows(self):
         self.rows = np.reshape(
             np.array([cell.__dict__() for cell in self.cells]), self.dimensions
-        )
+        ).tolist()
 
-    def __dict__(self):
-        return self.rows
+    def __repr__(self):
+        return json.dumps(self.rows)
 
 
 class ImageCell(Cell):
