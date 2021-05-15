@@ -7,13 +7,15 @@ import { createExcel } from "./exporting/excel";
 import { Preview } from "./components/Preview";
 import JSZip from "jszip";
 
+import DEV_DATA from "./data.json";
+
 export type ParagraphEl = {
   data_type: "text";
   data: string;
 };
 export type TableEl = {
   data_type: "table";
-  data: any[][];
+  data: { data: string; span: [number, number] }[][];
 };
 
 export type DocElement = ParagraphEl | TableEl;
@@ -100,7 +102,7 @@ function App() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const files = e.currentTarget.file.files as FileList;
 
@@ -119,28 +121,36 @@ function App() {
     }
     setFileNum(files.length);
     setprocessonigStatus("loading");
-    fetch(
-      window.location.protocol +
-        "//" +
-        window.location.hostname +
-        ":8000/api/upload-files",
-      { method: "POST", body: formData }
-    )
-      .then((res) => res.json())
-      .then(async (res: DirtyResponse) => {
-        console.log("Got from server", res);
+    // fetch(
+    //   window.location.protocol +
+    //     "//" +
+    //     window.location.hostname +
+    //     ":8000/api/upload-files",
+    //   { method: "POST", body: formData }
+    // )
+    //   .then((res) => res.json())
+    //   .then(async (res: DirtyResponse) => {
+    //     console.log("Got from server", res);
 
-        const data = await parseAllResponce(res);
+    //     const data = await parseAllResponce(res);
 
-        setHDoc(data);
-        setprocessonigStatus("success");
-        setTimeWait(0);
-      })
-      .catch((err) => {
-        console.log(err);
-        setprocessonigStatus("error");
-        setTimeWait(0);
-      });
+    //     setHDoc(data);
+    //     setprocessonigStatus("success");
+    //     setTimeWait(0);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     setprocessonigStatus("error");
+    //     setTimeWait(0);
+    //   });
+
+    // DEVVVVV
+
+    //@ts-ignore
+    setHDoc(await parseAllResponce(DEV_DATA));
+    setprocessonigStatus("success");
+    setTimeWait(0);
+    // DEV_DATA
   };
 
   return (
