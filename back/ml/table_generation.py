@@ -120,6 +120,7 @@ def generate_table_from_tesseract(tesseract_table: TesseractTable) -> Table:
     )
     table.fill_table()
     table.sort_table()
+    # print([cell.coordinates for cell in table.cells])
     table.gen_rows()
 
     return table

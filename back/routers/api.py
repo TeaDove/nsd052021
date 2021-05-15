@@ -2,6 +2,8 @@ import json
 from typing import List
 
 from fastapi import APIRouter, UploadFile, File
+from fastapi.encoders import jsonable_encoder
+from starlette.responses import JSONResponse
 
 from internal.processing import process_pdf, process_jpg, process_png
 from models.models import ContentType, ProcessedResponse
@@ -22,6 +24,8 @@ async def upload_files(files: List[UploadFile] = File(...)):
         }.get(content_type, ContentType.png)
         table = process_function(file.file)
         table_name = filename
-        processed_response = ProcessedResponse(name=table_name, content=table)
-        processed_responses.append(processed_response.dict())
-    return processed_responses
+        processed_response = ProcessedResponse(name=table_name, content=table.rows)
+        processed_responses.append(processed_response)
+
+    json_compatible_response = jsonable_encoder(processed_responses)
+    return JSONResponse(content=json_compatible_response)

@@ -26,12 +26,12 @@ class Cell:
 class Table:
     cells: List[Cell]
     dimensions: Tuple[int, int]
-    grid: List[Tuple[int, int]]
     rows: List[Cell]
 
     def fill_table(self):
         cell_coords = [cell.coordinates for cell in self.cells]
-        for grid_point in self.grid:
+        grid = [(i, k) for i in range(self.dimensions[0]) for k in range(self.dimensions[1])]
+        for grid_point in grid:
             if grid_point not in cell_coords:
                 new_cell = Cell()
                 new_cell.coordinates = grid_point
@@ -42,14 +42,13 @@ class Table:
         new_cells = []
         flag = True
         for cell in self.cells:
+            if (
+                    cell.coordinates[0] >= self.dimensions[0]
+                    or cell.coordinates[1] >= self.dimensions[1]
+            ):
+                continue
             for new_cell in new_cells:
                 if cell.coordinates == new_cell.coordinates:
-                    flag = False
-                    break
-                elif (
-                        cell.coordinates[0] >= self.dimensions[0]
-                        or cell.coordinates[1] >= self.dimensions[1]
-                ):
                     flag = False
                     break
             if flag:
