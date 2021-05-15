@@ -70,7 +70,7 @@ function App() {
     // formData.append("files", file);
 
     for (let i = 0; i < files.length; i++) {
-      formData.append(files[i].name, files[i]);
+      formData.append("files", files[i]);
     }
 
     fetch(
