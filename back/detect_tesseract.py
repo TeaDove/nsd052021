@@ -2,13 +2,13 @@ from __future__ import print_function
 
 import io
 import re
-from typing import IO, Any, Union
+from typing import IO, Union
 
 import cv2
 import numpy as np
 import pytesseract
-from imutils import contours
 from PIL import Image
+from imutils import contours
 
 try:
     import urllib.request as urllib
@@ -138,7 +138,6 @@ def get_text(path_to_image: Union[str, IO]):
             table_text.append({"x": x, "y": y, "w": w, "h": h, "text": text})
 
     return table_text
-
 
 # with open("test_2.png", "rb") as f:
 #     print(get_text(f))

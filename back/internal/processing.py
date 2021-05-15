@@ -14,7 +14,6 @@ def process_jpg(contents: IO) -> Table:
 
 
 def process_png(contents: IO) -> Table:
-
     model_result = detect_tesseract.get_text(contents)
     tesseract_table = TesseractTable(model_result)
 

@@ -1,9 +1,7 @@
 from enum import Enum
-from typing import List, Optional, Any
+from typing import Optional, Any
 
 from pydantic import BaseModel
-
-from models.tables import Table
 
 
 class ContentType(str, Enum):
@@ -14,5 +12,4 @@ class ContentType(str, Enum):
 
 class ProcessedResponse(BaseModel):
     name: Optional[str]
-    content: Optional[Table]
-
+    content: Any
