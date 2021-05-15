@@ -24,6 +24,7 @@ class Table:
     cells: List[Cell]
     dimensions: Tuple[int, int]
     grid: List[Tuple[int, int]]
+    rows: List[Cell]
 
     def fill_table(self):
         cell_coords = [cell.coordinates for cell in self.cells]
@@ -43,8 +44,8 @@ class Table:
                     flag = False
                     break
                 elif (
-                    cell.coordinates[0] >= self.dimensions[0]
-                    or cell.coordinates[1] >= self.dimensions[1]
+                        cell.coordinates[0] >= self.dimensions[0]
+                        or cell.coordinates[1] >= self.dimensions[1]
                 ):
                     flag = False
                     break
@@ -57,16 +58,12 @@ class Table:
         self.cells = sorted(self.cells)
 
     def gen_rows(self):
-        rows = np.reshape(
+        self.rows = np.reshape(
             np.array([cell.__dict__() for cell in self.cells]), self.dimensions
         )
-        return rows.tolist()
 
     def __dict__(self):
-        return [row for row in self.gen_rows()]
-
-    def __str__(self):
-        return json.dumps(self.__dict__())
+        return self.rows
 
 
 class ImageCell(Cell):
@@ -83,7 +80,7 @@ class ImageTable:
         if cell is not None:
             coordinates = cell.coordinates
             size = cell.size
-            roi = image[coordinates[0] : size[1], coordinates[1] : size[0]]
+            roi = image[coordinates[0]: size[1], coordinates[1]: size[0]]
             return roi
         else:
             return np.zeros(1)
@@ -92,9 +89,9 @@ class ImageTable:
 class TesseractTable:
     cells: List[Cell]
 
-    def __init__(self, data: List[Dict]):
+    def __init__(self, content: List[Dict]):
         self.cells = []
-        for data_cell in data:
+        for data_cell in content:
             coordinates = (data_cell["y"], data_cell["x"])
             size = (data_cell["w"], data_cell["h"])
             content = data_cell["text"]

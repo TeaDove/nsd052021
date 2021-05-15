@@ -31,7 +31,7 @@ def find_min_size(cells: List[Union[ImageCell, Cell]]) -> Tuple[int, int]:
 
 
 def quantize_cells(
-    cells: List[Cell], grid: List[Tuple[int, int]], min_size: Tuple[int, int], borders
+        cells: List[Cell], grid: List[Tuple[int, int]], min_size: Tuple[int, int], borders
 ) -> List[Cell]:
     quantized_cells = []
     for cell in cells:
@@ -58,15 +58,15 @@ def quantize_cells(
         )
         # print(closest_grid_point_0, closest_grid_point_1)
         # print("---")
-        new_cell.coordinates = (closest_grid_point_0, closest_grid_point_1)
+        new_cell.coordinates = (closest_grid_point_1, closest_grid_point_0)
 
         # Quantize cell size
 
         size = cell.size
-        size_0 = int(np.round(size[0] / min_size[0]) + 1)
-        size_1 = int(np.round(size[1] / min_size[1]) + 1)
+        size_0 = int(np.round(size[0] / min_size[0]))
+        size_1 = int(np.round(size[1] / min_size[1]))
 
-        new_cell.size = (size_0, size_1)
+        new_cell.size = (size_1, size_0)
 
         quantized_cells.append(new_cell)
 
@@ -82,6 +82,8 @@ def generate_table_from_image(image_table: ImageTable) -> Table:
         for i in range(0, image_size[1] + min_size[0], min_size[0])
         for k in range(0, image_size[0] + min_size[1], min_size[1])
     ]
+
+    # TODO
 
     return table
 
@@ -108,12 +110,7 @@ def generate_table_from_tesseract(tesseract_table: TesseractTable) -> Table:
         for i in range(0, (borders[2] - borders[0] + min_size[0]) // min_size[0])
         for k in range(0, (borders[3] - borders[1] + min_size[1]) // min_size[1])
     ]
-    # print(len(quantized_grid))
-    # print(quantized_grid)
-    # print(
-    #     (borders[2] - borders[0]) // min_size[0] + 1,
-    #     (borders[3] - borders[1]) // min_size[1] + 1,
-    # )
+
     quantized_cells = quantize_cells(tesseract_table.cells, grid, min_size, borders)
     table.cells = quantized_cells
     table.grid = quantized_grid
@@ -123,6 +120,6 @@ def generate_table_from_tesseract(tesseract_table: TesseractTable) -> Table:
     )
     table.fill_table()
     table.sort_table()
-    # print([cell.coordinates for cell in table.cells])
+    table.gen_rows()
 
     return table

@@ -19,9 +19,8 @@ async def upload_files(files: List[UploadFile] = File(...)) -> List[ProcessedRes
             ContentType.jpg: process_jpg,
             ContentType.png: process_png,
         }.get(content_type, ContentType.png)
-        processed_response = process_function(file.file)
-        processed_response.name = filename
-        # print(processed_response.__dict__())
-        processed_responses.append(processed_response.__dict__())
-    print(processed_responses)
+        table = process_function(file.file)
+        table_name = filename
+        processed_response = ProcessedResponse(name=table_name, content=table)
+        processed_responses.append(processed_response)
     return processed_responses
