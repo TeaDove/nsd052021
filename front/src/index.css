@@ -42,3 +42,11 @@ input[type="file"],
 button {
   font-size: 1.2rem;
 }
+
+.progressbar {
+  height: 2ch;
+  position: relative;
+}
+
+.progressbar::after {
+}

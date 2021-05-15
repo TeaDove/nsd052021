@@ -29,10 +29,27 @@ type DirtyResponse = {
   data: DirtyDocElement[];
 }[];
 
+type Status = "loading" | "error" | "success" | "idle";
+
 function App() {
-  const [pingStatus, setPing] =
-    useState<"loading" | "error" | "success">("loading");
+  const [pingStatus, setPing] = useState<Status>("loading");
+  const [processonigStatus, setprocessonigStatus] = useState<Status>("idle");
+  const [timeWait, setTimeWait] = useState<number>(0);
+  const [fileNum, setFileNum] = useState<number>(1);
   const [hDoc, setHDoc] = useState<HDocMany>([]);
+
+  useEffect(() => {
+    let timer: any;
+    if (processonigStatus === "loading") {
+      timer = setInterval(() => {
+        setTimeWait((p) => p + 40 / fileNum / 1000 / (1000 / 33));
+      }, 33);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [fileNum, processonigStatus]);
 
   useEffect(() => {
     fetch(window.location.protocol + "//" + window.location.hostname + ":8000/")
@@ -94,11 +111,11 @@ function App() {
     const formData = new FormData();
     // formData.append("files", file);
     // formData.append("files", file);
-
     for (let i = 0; i < files.length; i++) {
       formData.append("files", files[i]);
     }
-
+    setFileNum(files.length);
+    setprocessonigStatus("loading");
     fetch(
       window.location.protocol +
         "//" +
@@ -113,9 +130,13 @@ function App() {
         const data = await parseAllResponce(res);
 
         setHDoc(data);
+        setprocessonigStatus("success");
+        setTimeWait(0);
       })
       .catch((err) => {
         console.log(err);
+        setprocessonigStatus("error");
+        setTimeWait(0);
       });
   };
 
@@ -148,6 +169,12 @@ function App() {
         <br />
         <input type="submit" value="Отправить" />
       </form>
+
+      {processonigStatus === "loading" && (
+        <div className="progressbar" data-value={timeWait}>
+          {timeWait}
+        </div>
+      )}
 
       {hDoc.length === 0 ? (
         <p>Пока здесь пусто 😶. Попробуйте загрузить файл ⬆️</p>
