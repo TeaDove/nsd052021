@@ -6,6 +6,7 @@ import { createDoc } from "./exporting/word";
 import { createExcel } from "./exporting/excel";
 import { Preview } from "./components/Preview";
 import JSZip from "jszip";
+import { useDropzone } from "react-dropzone";
 
 import DEV_DATA from "./data.json";
 
@@ -42,6 +43,18 @@ function App() {
   const [timeWait, setTimeWait] = useState<number>(0);
   const [fileNum, setFileNum] = useState<number>(1);
   const [hDoc, setHDoc] = useState<HDocMany>([]);
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
+
+  const FilesInForm = acceptedFiles.map((file) => (
+    // @ts-ignore
+    <li key={file.path}>
+      {
+        // @ts-ignore
+        file.path
+      }{" "}
+      - {file.size} bytes
+    </li>
+  ));
 
   useEffect(() => {
     let timer: any;
@@ -104,7 +117,7 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const files = e.currentTarget.file.files as FileList;
+    const files = e.currentTarget?.file?.files as FileList;
 
     if (files.length === 0) {
       console.log("No file detected. Aborting");
@@ -170,17 +183,33 @@ function App() {
       </div>
       <br />
       <form onSubmit={handleSubmit}>
-        <label htmlFor="file">Выберите файл для обработки</label>
-        <br />
-        <input
+        {/* <label htmlFor="file">Выберите файл для обработки</label> */}
+        {/* <br /> */}
+        {/* <input
           type="file"
           name="file"
           id="file"
           accept=".jpg, .jpeg, .png, .webp, .pdf"
           required
           multiple
-        />
-        <br />
+        /> */}
+        <section className="dropzone-container">
+          <div {...getRootProps({ className: "dropzone" })}>
+            <input {...getInputProps({ name: "file" })} />
+            <p>
+              {/* Drag 'n' drop some files here, or click to select files */}
+              Перетащите файлы или кликните, чтобы выбрать
+            </p>
+          </div>
+
+          <aside>
+            <h4>
+              {FilesInForm.length !== 0 ? "Файлы" : "Нет выбранных файлов"}
+            </h4>
+            <ul>{FilesInForm}</ul>
+          </aside>
+        </section>
+
         <input type="submit" value="Отправить" />
       </form>
 
@@ -195,7 +224,7 @@ function App() {
       )}
 
       {hDoc.length === 0 ? (
-        <p>Пока здесь пусто 😶. Попробуйте загрузить файл ⬆️</p>
+        <p>Пока здесь пусто. Попробуйте загрузить файл ⬆️</p>
       ) : (
         <>
           {hDoc.map((d, i) => (

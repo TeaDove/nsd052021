@@ -16,13 +16,14 @@ code {
 .slim {
   max-width: 1100px;
   margin: auto;
+  padding: 0 0.5em;
 }
 
-@media only screen and (max-width: 600px) {
+/* @media only screen and (max-width: 1140px) {
   .slim {
     margin: 0 0.5em;
   }
-}
+} */
 
 .status {
 }
@@ -54,4 +55,16 @@ button {
 .progressbar .loading {
   height: 100%;
   background-color: lightskyblue;
+}
+
+/* for  */
+.dropzone-container {
+}
+
+.dropzone {
+  /* dropzone */
+  background: ghostwhite;
+  border: 2px gainsboro dashed;
+  border-radius: 8px;
+  padding: 1em;
 }
