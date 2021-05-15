@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -35,8 +35,8 @@ class ProcessedTable(ProcessedData):
 
 
 class ProcessedResponse(BaseModel):
-    name: str
-    data: List[ProcessedData]
+    name: Optional[str]
+    data: Optional[List[ProcessedData]]
 
     def __dict__(self):
         return {

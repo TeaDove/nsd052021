@@ -1,4 +1,3 @@
-import json
 from typing import List
 
 from fastapi import APIRouter, UploadFile, File
@@ -12,8 +11,8 @@ router = APIRouter(
 )
 
 
-@router.post("/api/upload-files")
-async def upload_files(files: List[UploadFile] = File(...)):
+@router.post("/upload-files", response_model=List[ProcessedResponse])
+async def upload_files(files: List[UploadFile] = File(...)) -> List[ProcessedResponse]:
     processed_responses: List[ProcessedResponse] = []
     for file in files:
         content_type = ContentType(file.content_type)
@@ -23,10 +22,9 @@ async def upload_files(files: List[UploadFile] = File(...)):
             ContentType.jpg: process_jpg,
             ContentType.png: process_png
         }.get(content_type, ContentType.png)
-        with await file.read() as contents:
-            processed_response = await process_function(contents)
-            processed_response.name = filename
-            processed_responses.append(processed_response)
+        contents = await file.read()
+        processed_response = await process_function(contents)
+        processed_response.name = filename
+        processed_responses.append(processed_response)
 
-    response = json.dumps(processed_responses)
-    return response
+    return processed_responses
