@@ -20,10 +20,7 @@ class ProcessedData(BaseModel):
     data: str
 
     def __dict__(self):
-        return {
-            "type": self.data_type.__str__,
-            "data": self.data.__dict__
-        }
+        return {"type": self.data_type.__str__, "data": self.data.__dict__}
 
 
 class ProcessedText(ProcessedData):
@@ -39,7 +36,4 @@ class ProcessedResponse(BaseModel):
     data: List[ProcessedData]
 
     def __dict__(self):
-        return {
-            "name": self.name,
-            "data": [d.__dict__ for d in self.data]
-        }
+        return {"name": self.name, "data": [d.__dict__ for d in self.data]}

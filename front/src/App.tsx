@@ -56,22 +56,28 @@ function App() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const file = (e.currentTarget.file.files as FileList).item(0);
-    if (file === null) {
+    const files = e.currentTarget.file.files as FileList;
+
+    if (files.length === 0) {
       console.log("No file detected. Aborting");
       return;
     }
-
-    console.log(file, typeof file);
+    // const file = (e.currentTarget.file.files as FileList).item(0);
+    // console.log(file, typeof file);
 
     const formData = new FormData();
-    formData.append("file", file);
+    // formData.append("files", file);
+    // formData.append("files", file);
+
+    for (let i = 0; i < files.length; i++) {
+      formData.append(files[i].name, files[i]);
+    }
 
     fetch(
       window.location.protocol +
         "//" +
         window.location.hostname +
-        ":8000/get-table",
+        ":8000/api/upload-files",
       { method: "POST", body: formData }
     )
       .then((res) => res.json())
@@ -81,6 +87,9 @@ function App() {
         const data = await parseDirtyResponse(res);
 
         setHDoc(data);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   };
 
@@ -108,6 +117,7 @@ function App() {
           id="file"
           accept=".jpg, .jpeg, .png, .webp, .pdf"
           required
+          multiple
         />
         <br />
         <input type="submit" value="Отправить" />
