@@ -43,7 +43,7 @@ def quantize_cells(
         closest_grid_point = (0, 0)
         for grid_point in grid:
             distance = np.linalg.norm(
-                np.array(coordinates) - np.array(grid_point[::-1])
+                np.array(coordinates) - np.array(grid_point)
             )
             if distance < min_distance:
                 closest_grid_point = grid_point
