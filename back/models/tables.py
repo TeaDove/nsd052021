@@ -11,10 +11,10 @@ class Cell:
     content: Any
 
     def __lt__(self, other):
-        if self.coordinates[1] == other.coordinates[1]:
-            return self.coordinates[0] < other.coordinates[0]
-        else:
+        if self.coordinates[0] == other.coordinates[0]:
             return self.coordinates[1] < other.coordinates[1]
+        else:
+            return self.coordinates[0] < other.coordinates[0]
 
     def __repr__(self):
         return json.dumps(self.__dict__())
@@ -62,7 +62,7 @@ class Table:
     def gen_rows(self):
         self.rows = np.reshape(
             np.array([cell.__dict__() for cell in self.cells]), self.dimensions
-        ).tolist()
+        ).T.tolist()
 
     def __repr__(self):
         return json.dumps(self.rows)
