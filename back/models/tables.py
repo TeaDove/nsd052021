@@ -35,7 +35,7 @@ class Table:
             if grid_point not in cell_coords:
                 new_cell = Cell()
                 new_cell.coordinates = grid_point
-                new_cell.size = (1, 1)
+                new_cell.size = (0, 0)
                 new_cell.content = None
 
                 self.cells.append(new_cell)
