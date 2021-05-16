@@ -38,27 +38,15 @@ def quantize_cells(
 
         # Quantize cell's coordinates
 
-        coordinates = cell.coordinates
-        min_distance = 1e10
-        closest_grid_point = (0, 0)
-        for grid_point in grid:
-            distance = np.linalg.norm(
-                np.array(coordinates) - np.array(grid_point)
-            )
-            if distance < min_distance:
-                closest_grid_point = grid_point
-                min_distance = distance
+        coordinates = cell.coordinates[::-1]
+        coordinates[0] = (coordinates[0] - borders[0]) // min_size[0]
+        coordinates[1] = (coordinates[1] - borders[1]) // min_size[1]
+
         # print(closest_grid_point)
         new_cell = cell
-        closest_grid_point_0 = int(
-            np.round((closest_grid_point[0] - borders[0]) / min_size[0])
-        )
-        closest_grid_point_1 = int(
-            np.round((closest_grid_point[1] - borders[1]) / min_size[1])
-        )
         # print(closest_grid_point_0, closest_grid_point_1)
         # print("---")
-        new_cell.coordinates = (closest_grid_point_1, closest_grid_point_0)
+        new_cell.coordinates = coordinates
 
         # Quantize cell size
 
