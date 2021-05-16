@@ -35,8 +35,8 @@ export function Preview({ table }: { table: HTable }) {
                     <td
                       style={{ border: "1px solid black" }}
                       key={cellIndex}
-                      colSpan={Math.max(cell.span[0] + 1, 1)}
-                      rowSpan={Math.max(cell.span[1] + 1, 1)}
+                      //   colSpan={Math.max(cell.span[0] + 1, 1)}
+                      //   rowSpan={Math.max(cell.span[1] + 1, 1)}
                     >
                       {cell.data}
                     </td>

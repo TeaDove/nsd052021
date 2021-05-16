@@ -117,12 +117,15 @@ function App() {
       hDoc.map(async (d, i) => {
         console.log("inside loop", d);
 
-        const doc = createExcel(JSON.parse(JSON.stringify(d)));
+        const doc = createExcel(d);
         const buffer = await doc.xlsx.writeBuffer();
-        archive.file(`${d.name || `table-${i}`}.xlsx`, buffer);
+        archive.file(
+          `${d.name || `table-${i}-${new Date().toISOString()}`}.xlsx`,
+          buffer
+        );
       })
     );
-
+    // archive.
     archive.generateAsync({ type: "blob" }).then((content) => {
       downloadFile(content, `tables.zip`);
     });
