@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   Document as XDocument,
   Paragraph,
@@ -8,12 +9,12 @@ import {
 import { DocElement, ParagraphEl, TableEl } from "../App";
 
 function getParagraph(el: ParagraphEl): Paragraph {
-  return new Paragraph(el.data);
+  return new Paragraph(el.content);
 }
 
 function getTable(el: TableEl): Table {
   const table = new Table({
-    rows: el.data.map(
+    rows: el.content.map(
       (row) =>
         new TableRow({
           children: row.map(

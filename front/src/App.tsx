@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import * as csv from "fast-csv";
-import { Document as XDocument, Packer } from "docx";
+// import { Document as XDocument, Packer } from "docx";
 import downloadFile from "js-file-download";
-import { createDoc } from "./exporting/word";
+// import { createDoc } from "./exporting/word";
 import { createExcel } from "./exporting/excel";
 import { Preview } from "./components/Preview";
 import JSZip from "jszip";
@@ -10,29 +10,38 @@ import { useDropzone } from "react-dropzone";
 
 import DEV_DATA from "./data.json";
 
-export type ParagraphEl = {
-  data_type: "text";
-  data: string;
-};
-export type TableEl = {
-  data_type: "table";
-  data: { data: string; span: [number, number] }[][];
-};
+// export type ParagraphEl = {
+//   data_type: "text";
+//   content: string;
+// };
+// export type TableEl = {
+//   // data_type: "table";
+//   content: { data: string; span: [number, number] }[][];
+// };
+// { data: string; span: [number, number] }[][]
+// export type DocElement =
+//   // ParagraphEl |
+//   TableEl;
 
-export type DocElement = ParagraphEl | TableEl;
-
-type DirtyDocElement = DocElement & {
+type DirtyDocElement = HDoc & {
   /**
    * JSON in string
    */
-  data: string;
+  content: string;
 };
 
-export type HDoc = DocElement[];
-export type HDocMany = { name: string; data: HDoc }[];
+type Cell = { data: string; span: [number, number] };
+type Row = Cell[];
+export type HTable = Row[];
+
+export type HDoc = {
+  name: string;
+  content: HTable;
+};
+export type HDocMany = HDoc[];
 type DirtyResponse = {
   name: string;
-  data: DirtyDocElement[];
+  content: HTable;
 }[];
 
 type Status = "loading" | "error" | "success" | "idle";
@@ -82,29 +91,33 @@ function App() {
       });
   }, []);
 
-  const handleDocxDownload = async () => {
-    const archive = new JSZip();
+  // const handleDocxDownload = async () => {
+  //   const archive = new JSZip();
 
-    await Promise.all(
-      hDoc.map(async (d, i) => {
-        const doc = createDoc(d.data);
-        if (doc === null) return;
-        archive.file(`${d.name || `doc-${i}`}.docx`, Packer.toBlob(doc));
-        // downloadFile(await Packer.toBlob(doc), `${d.name || `doc-${i}`}.docx`);
-      })
-    );
+  //   await Promise.all(
+  //     hDoc.map(async (d, i) => {
+  //       const doc = createDoc(d.content);
+  //       if (doc === null) return;
+  //       archive.file(`${d.name || `doc-${i}`}.docx`, Packer.toBlob(doc));
+  //       // downloadFile(await Packer.toBlob(doc), `${d.name || `doc-${i}`}.docx`);
+  //     })
+  //   );
 
-    archive.generateAsync({ type: "blob" }).then((content) => {
-      downloadFile(content, `documents.zip`);
-    });
-  };
+  //   archive.generateAsync({ type: "blob" }).then((content) => {
+  //     downloadFile(content, `documents.zip`);
+  //   });
+  // };
 
   const handleExcelDownload = async () => {
+    console.log(hDoc);
+
     const archive = new JSZip();
 
     await Promise.all(
       hDoc.map(async (d, i) => {
-        const doc = createExcel(d.data);
+        console.log("inside loop", d);
+
+        const doc = createExcel(JSON.parse(JSON.stringify(d)));
         const buffer = await doc.xlsx.writeBuffer();
         archive.file(`${d.name || `table-${i}`}.xlsx`, buffer);
       })
@@ -115,9 +128,8 @@ function App() {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const files = e.currentTarget?.file?.files as FileList;
+  const handleSubmit = async () => {
+    const files = acceptedFiles;
 
     if (files.length === 0) {
       console.log("No file detected. Aborting");
@@ -145,7 +157,8 @@ function App() {
       .then(async (res: DirtyResponse) => {
         console.log("Got from server", res);
 
-        const data = await parseAllResponce(res);
+        // const data = await parseAllResponce(res);
+        const data = res;
 
         setHDoc(data);
         setprocessonigStatus("success");
@@ -182,10 +195,10 @@ function App() {
         </span>
       </div>
       <br />
-      <form onSubmit={handleSubmit}>
-        {/* <label htmlFor="file">Выберите файл для обработки</label> */}
-        {/* <br /> */}
-        {/* <input
+      {/* <form onSubmit={}> */}
+      {/* <label htmlFor="file">Выберите файл для обработки</label> */}
+      {/* <br /> */}
+      {/* <input
           type="file"
           name="file"
           id="file"
@@ -193,25 +206,32 @@ function App() {
           required
           multiple
         /> */}
-        <section className="dropzone-container">
-          <div {...getRootProps({ className: "dropzone" })}>
-            <input {...getInputProps({ name: "file" })} />
-            <p>
-              {/* Drag 'n' drop some files here, or click to select files */}
-              Перетащите файлы или кликните, чтобы выбрать
-            </p>
-          </div>
+      <section className="dropzone-container">
+        <div {...getRootProps({ className: "dropzone" })}>
+          <input
+            {...getInputProps({
+              name: "file",
+              multiple: true,
+              required: true,
+              accept: ".jpg, .jpeg, .png, .webp, .pdf",
+              // tabIndex: 0,
+              autoFocus: true,
+            })}
+          />
+          <p>
+            {/* Drag 'n' drop some files here, or click to select files */}
+            Перетащите файлы или кликните, чтобы выбрать
+          </p>
+        </div>
 
-          <aside>
-            <h4>
-              {FilesInForm.length !== 0 ? "Файлы" : "Нет выбранных файлов"}
-            </h4>
-            <ul>{FilesInForm}</ul>
-          </aside>
-        </section>
+        <aside>
+          <h4>{FilesInForm.length !== 0 ? "Файлы" : "Нет выбранных файлов"}</h4>
+          <ul>{FilesInForm}</ul>
+        </aside>
+      </section>
 
-        <input type="submit" value="Отправить" />
-      </form>
+      <input type="button" value="Отправить" onClick={handleSubmit} />
+      {/* </form> */}
 
       {processonigStatus === "loading" && (
         <div className="progressbar">
@@ -230,12 +250,12 @@ function App() {
           {hDoc.map((d, i) => (
             <div key={d.name}>
               <h2>{d.name || `Файл № ${i + 1}`}</h2>
-              <Preview table={d.data} />
+              <Preview table={d.content} />
             </div>
           ))}
-          {hDoc !== null && (
+          {/* {hDoc !== null && (
             <button onClick={handleDocxDownload}>Скачать docx 📄</button>
-          )}
+          )} */}
           {hDoc !== null && (
             <button onClick={handleExcelDownload}>Скачать excel </button>
           )}
@@ -247,32 +267,34 @@ function App() {
 
 export default App;
 
-function parseAllResponce(params: DirtyResponse): Promise<HDocMany> {
-  return Promise.all(
-    params.map(async (file) => ({
-      name: file.name,
-      data: await parseDirtyResponse(file.data),
-    }))
-  );
-}
+// function parseAllResponce(params: DirtyResponse): Promise<HDocMany> {
+//   return Promise.all(
+//     params.map(async (file) => ({
+//       name: file.name,
+//       content: await parseDirtyResponse(file.content),
+//     }))
+//   );
+// }
 
-async function parseDirtyResponse(res: DirtyDocElement[]): Promise<HDoc> {
-  if (!res) {
-    return [
-      {
-        data_type: "text",
-        data: "Пусто",
-      },
-    ];
-  }
+async function parseDirtyResponse(res: string): Promise<HTable> {
+  // if (!res) {
+  //   return [
+  //     {
+  //       data_type: "text",
+  //       content: "Пусто",
+  //     },
+  //   ];
+  // }
 
-  return await Promise.all(
-    res.map((elem) => {
-      if (elem.data_type === "text") return elem;
+  return JSON.parse(res);
 
-      return { data_type: elem.data_type, data: JSON.parse(elem.data) };
-    })
-  );
+  // return await Promise.all(
+  //   res.map((elem) => {
+  //     if (elem.data_type === "text") return elem;
+
+  //     return { data_type: elem.data_type, content: JSON.parse(elem.content) };
+  //   })
+  // );
 }
 // return new Promise<DocElement>((res, rej) => {
 //   let data: any[] = [];
