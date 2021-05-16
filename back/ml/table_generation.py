@@ -81,7 +81,7 @@ def generate_table_from_tesseract(tesseract_table: TesseractTable) -> Table:
     tesseract_table.cells = [
         cell
         for cell in tesseract_table.cells
-        if cell.size[0] > 12 and cell.size[1] > 12
+        if cell.size[0] > 12 and cell.size[1] > 12 and cell.content != None
     ]
     min_size = find_min_size(tesseract_table.cells)
     borders = find_borders(tesseract_table.cells)
