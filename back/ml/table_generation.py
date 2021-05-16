@@ -93,18 +93,11 @@ def generate_table_from_tesseract(tesseract_table: TesseractTable) -> Table:
         for k in range(borders[1], borders[3] + min_size[1], min_size[1])
     ]
 
-    quantized_grid = [
-        (i, k)
-        for i in range(0, (borders[2] - borders[0] + min_size[0]) // min_size[0])
-        for k in range(0, (borders[3] - borders[1] + min_size[1]) // min_size[1])
-    ]
-
     quantized_cells = quantize_cells(tesseract_table.cells, grid, min_size, borders)
     table.cells = quantized_cells
-    table.grid = quantized_grid
     table.dimensions = (
-        (borders[2] - borders[0]) // min_size[0] + 1,
         (borders[3] - borders[1]) // min_size[1] + 1,
+        (borders[2] - borders[0]) // min_size[0] + 1,
     )
     table.fill_table()
     table.sort_table()
