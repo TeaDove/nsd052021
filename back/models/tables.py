@@ -11,10 +11,10 @@ class Cell:
     content: Any
 
     def __lt__(self, other):
-        if self.coordinates[0] == other.coordinates[0]:
-            return self.coordinates[1] < other.coordinates[1]
-        else:
+        if self.coordinates[1] == other.coordinates[1]:
             return self.coordinates[0] < other.coordinates[0]
+        else:
+            return self.coordinates[1] < other.coordinates[1]
 
     def __repr__(self):
         return json.dumps(self.__dict__())
