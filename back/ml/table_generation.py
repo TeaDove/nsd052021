@@ -25,7 +25,7 @@ def find_borders(cells: List[Union[ImageCell, Cell]]) -> Tuple[int, int, int, in
 def find_min_size(cells: List[Union[ImageCell, Cell]]) -> Tuple[int, int]:
     min_size = (1e10, 1e10)
     for cell in cells:
-        if cell.size[0] <= min_size[0] and cell.size[1] <= min_size[1]:
+        if cell.size[0] <= min_size[0] or cell.size[1] <= min_size[1]:
             min_size = cell.size
     return min_size
 
