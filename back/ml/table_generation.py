@@ -58,7 +58,7 @@ def quantize_cells(
         )
         # print(closest_grid_point_0, closest_grid_point_1)
         # print("---")
-        new_cell.coordinates = (closest_grid_point_0, closest_grid_point_1)
+        new_cell.coordinates = (closest_grid_point_1, closest_grid_point_0)
 
         # Quantize cell size
 
